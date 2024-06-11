@@ -6,14 +6,17 @@ import Cookies from 'js-cookie';
 
 const Home = () => {
     const {data, isLoading, error} = useUserProfile()
+    if (isLoading) {
+        return (
+            <div>loading ...</div>
+        )
+    }
     console.log(data);
     return (
         <div>
             <h1>Home</h1>
             <p>Welcome to home page</p>
-            <Button>
-                <Link to="/signin" >登入</Link>
-            </Button>
+            <p>{data.username}</p>
         </div>
     )
 }
