@@ -4,6 +4,8 @@ import SignIn from '../features/signin';
 import Home from '../features/home';
 import useLoggedInStore from '../store/useLoggedIn';
 import User from '../features/userlist/User';
+import Friend from '../features/friend/Friend';
+import Group from '../features/group';
 
 const PrivateRoute = ({children}: {children: React.ReactElement}) => {
   const { isLoggedIn } = useLoggedInStore()
@@ -13,9 +15,14 @@ const PrivateRoute = ({children}: {children: React.ReactElement}) => {
 
 const RouterElement = () => (
   <>
-    <Route path="/signin" element={<SignIn />} />
-    <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
+    <Route path="/" element={<SignIn />} />
+    <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>}>
+    <Route index element={<Group />} />
+      <Route path="group" element={<Group />} />  
+      <Route path="friend/:userId" element={<Friend />} />
+    </Route>
     <Route path="/userList" element={<PrivateRoute><User /></PrivateRoute>} />
+    
   </>
 );
 
