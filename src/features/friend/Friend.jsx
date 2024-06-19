@@ -3,38 +3,42 @@ import { useFriendList } from './services/queries';
 import { useParams } from 'react-router-dom';
 import { SearchIcon } from '@chakra-ui/icons';
 import { useState } from 'react';
-import { useAddFriend, useSearch } from './services/mutations';
-
+import { useAddFriend, useDeleteFriend, useSearch } from './services/mutations';
 
 const Friend = () => {
-    const { userId } = useParams()
-    const [searchTerm, setsearchTerm] = useState('')
-    const { data, error , isLoading } = useFriendList(Number(userId))
-    const [isSearchVisible, setIsSearchVisible] = useState(false)
-    const [searchRes, setSearchReq] = useState([])
+    const { userId } = useParams();
+    const [searchTerm, setsearchTerm] = useState('');
+    const { data, error, isLoading } = useFriendList(Number(userId));
+    const [isSearchVisible, setIsSearchVisible] = useState(false);
+    const [searchRes, setSearchReq] = useState([]);
     const { mutateAsync: searchUser } = useSearch();
     const { mutateAsync: addFriend } = useAddFriend();
+    const { mutateAsync: deleteFriend } = useDeleteFriend();
 
     const handlerSearch = async () => {
         if (!searchTerm.trim()) {
-            return
+            return;
         }
-        const res = await searchUser(searchTerm)
-        setSearchReq(res.data)
-        setIsSearchVisible(true)
-    }
+        const res = await searchUser(searchTerm);
+        setSearchReq(res.data);
+        setIsSearchVisible(true);
+    };
 
     const handleAddFriend = async (friendId) => {
-        await addFriend({userId: Number(userId), friendId: Number(friendId)})
-        setIsSearchVisible(false)
-    }
+        await addFriend({ userId: Number(userId), friendId: Number(friendId) });
+        setIsSearchVisible(false);
+    };
 
     const handleCloseSearch = () => {
-        setIsSearchVisible(false); // 隱藏搜索結果視窗
+        setIsSearchVisible(false); // 隐藏搜索结果窗口
+    };
+
+    const handleDelete = async (friendId) => {
+        await deleteFriend({ userId: Number(userId), friendId: Number(friendId) });
     };
 
     if (isLoading) {
-        return <div>Loading ....</div>
+        return <div>Loading ....</div>;
     }
 
     return (
@@ -47,20 +51,22 @@ const Friend = () => {
                     p={5}
                     onChange={(e) => setsearchTerm(e.target.value)}
                 />
-                <Button colorScheme="teal" onClick={handlerSearch}><SearchIcon/></Button>
+                <Button colorScheme="teal" onClick={handlerSearch}><SearchIcon /></Button>
             </Flex>
-            <VStack spacing={4} align="stretch" mt={4} h="100%" >
+            <VStack spacing={4} align="stretch" mt={4} h="100%">
                 {data && data.length > 0 ? (
-                    data.map(({ Friend }) => (
-                        <Box key={Friend.id} p={4} borderBottomWidth="1px">
+                    data.map((friend) => (
+                        <Box key={friend.id} p={4} borderBottomWidth="1px">
                             <Flex justifyContent="space-around" alignItems="center">
-                                <Avatar size="md" src={Friend.profilePicture} alt={Friend.username} />
+                                <Avatar size="md" src={friend.profilePicture} alt={friend.name} />
                                 <Box>
-                                    <Text textAlign="left">名稱: {Friend.username}</Text>
-                                    <Text textAlign="left">信箱: {Friend.email}</Text>
+                                    <Text textAlign="left">名稱: {friend.name}</Text>
+                                    <Text textAlign="left">信箱: {friend.email}</Text>
                                 </Box>
-                                <Button colorScheme="red">刪除好友</Button>
-                                <Button colorScheme="teal">邀請加入</Button>
+                                <Box>
+                                    <Button mr={4} colorScheme="teal">邀請加入</Button>
+                                    <Button ml={4} colorScheme="red" onClick={() => handleDelete(friend.id)}>刪除好友</Button>
+                                </Box>
                             </Flex>
                         </Box>
                     ))
@@ -75,7 +81,7 @@ const Friend = () => {
                 {isSearchVisible && (
                     <Box position="absolute" top="60px" left="0" right="0" bg="white" borderRadius="10px" shadow="md" zIndex="10">
                         <VStack spacing={4} align="stretch" mt={4} p={4}>
-                        {searchRes.length > 0 ? (
+                            {searchRes.length > 0 ? (
                                 searchRes.map((user) => (
                                     <Box key={user.id} p={4} borderBottomWidth="1px">
                                         <Flex justifyContent="space-around" alignItems="center">
@@ -103,7 +109,7 @@ const Friend = () => {
                 )}
             </VStack>
         </Box>
-    )
-}
+    );
+};
 
-export default Friend
+export default Friend;
