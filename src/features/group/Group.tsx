@@ -7,6 +7,7 @@ const Group = () => {
     const {data, isLoading} = useGroupList()
 
     console.log(data);
+    
 
     if (isLoading) {
         return <div>Loading ...</div>
@@ -15,13 +16,13 @@ const Group = () => {
         <Box shadow="md" borderWidth="1px" borderRadius="10px" height="600px" p="10px" position="relative">
             <VStack spacing={4} align="stretch">
                 {
-                    data.map((group) => (
+                    data.map((group: any) => (
                         <Box key={group.id} p={5} textAlign="left" borderBottomWidth="1px">
-                            <Link as={NavLink} to={`/group/${group.id}`}>
+                            <NavLink to={`/group/${group.groupId}`}>
                                 <Heading fontSize="xl">{group.group.name}</Heading>
                                 <Text mt={2}>加入時間: {moment(group.joinAt).format('YYYY-MM-DD')}</Text>
                                 <Text mt={2}>總金額: $150</Text>
-                            </Link>
+                            </NavLink>
                         </Box>
                     ))
                 }

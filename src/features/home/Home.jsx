@@ -75,7 +75,6 @@ const AddGroupModal = ({ isOpen, onClose, userId }) => {
                     <Input
                         my={5}
                         padding={'10px'}
-                        variant="flushed"
                         placeholder="name"
                         type="name"
                         onChange={(e) => setInputName(e.target.value)}
@@ -91,7 +90,10 @@ const AddGroupModal = ({ isOpen, onClose, userId }) => {
                         onChange={setSelectedFried}
                         style={{ container: (base) => ({ ...base, marginTop: '10px' }) }}
                     />
-                    <Button onClick={handlerAddGroup} colorScheme='teal' m={5}>新增</Button>
+                    <Flex justifyContent="end" p={5}>
+                        <Button onClick={handlerAddGroup} colorScheme='teal' mr={3}>新增</Button>
+                        <Button onClick={onClose} ml={3}>取消</Button>
+                    </Flex>
                 </ModalBody>
             </ModalContent>
         </Modal>

@@ -6,14 +6,14 @@ import { useState } from 'react';
 import { useAddFriend, useDeleteFriend, useSearch } from './services/mutations';
 
 const Friend = () => {
-    const { userId } = useParams();
+    const { userId } = useParams<{ userId: string }>();
     const [searchTerm, setsearchTerm] = useState('');
-    const { data, error, isLoading } = useFriendList(Number(userId));
     const [isSearchVisible, setIsSearchVisible] = useState(false);
     const [searchRes, setSearchReq] = useState([]);
     const { mutateAsync: searchUser } = useSearch();
     const { mutateAsync: addFriend } = useAddFriend();
     const { mutateAsync: deleteFriend } = useDeleteFriend();
+    const { data, error, isLoading } = useFriendList(userId || '');
 
     const handlerSearch = async () => {
         if (!searchTerm.trim()) {
@@ -24,7 +24,7 @@ const Friend = () => {
         setIsSearchVisible(true);
     };
 
-    const handleAddFriend = async (friendId) => {
+    const handleAddFriend = async (friendId: string) => {
         await addFriend({ userId: Number(userId), friendId: Number(friendId) });
         setIsSearchVisible(false);
     };
@@ -33,7 +33,7 @@ const Friend = () => {
         setIsSearchVisible(false); // 隐藏搜索结果窗口
     };
 
-    const handleDelete = async (friendId) => {
+    const handleDelete = async (friendId: string) => {
         await deleteFriend({ userId: Number(userId), friendId: Number(friendId) });
     };
 
@@ -55,10 +55,10 @@ const Friend = () => {
             </Flex>
             <VStack spacing={4} align="stretch" mt={4} h="100%">
                 {data && data.length > 0 ? (
-                    data.map((friend) => (
+                    data.map((friend: any) => (
                         <Box key={friend.id} p={4} borderBottomWidth="1px">
                             <Flex justifyContent="space-around" alignItems="center">
-                                <Avatar size="md" src={friend.profilePicture} alt={friend.name} />
+                                <Avatar size="md" src={friend.profilePicture} />
                                 <Box>
                                     <Text textAlign="left">名稱: {friend.name}</Text>
                                     <Text textAlign="left">信箱: {friend.email}</Text>
@@ -82,10 +82,10 @@ const Friend = () => {
                     <Box position="absolute" top="60px" left="0" right="0" bg="white" borderRadius="10px" shadow="md" zIndex="10">
                         <VStack spacing={4} align="stretch" mt={4} p={4}>
                             {searchRes.length > 0 ? (
-                                searchRes.map((user) => (
+                                searchRes.map((user: any) => (
                                     <Box key={user.id} p={4} borderBottomWidth="1px">
                                         <Flex justifyContent="space-around" alignItems="center">
-                                            <Avatar size="md" src={user.profilePicture} alt={user.username} />
+                                            <Avatar size="md" src={user.profilePicture} />
                                             <Box>
                                                 <Text textAlign="left">名稱: {user.username}</Text>
                                                 <Text textAlign="left">信箱: {user.email}</Text>
