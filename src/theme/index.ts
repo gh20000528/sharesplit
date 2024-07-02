@@ -4,6 +4,8 @@ import { inputTheme } from './input';
 import { buttonTheme } from './button';
 import { selectTheme } from './select';
 import { menuTheme } from './menu';
+import '@fontsource/open-sans'
+import '@fontsource/raleway'
 
 const color = {
     primary: {

@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, Checkbox, Flex, FormControl, FormLabel, GridItem, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Tab, TabList, TabPanel, TabPanels, Tabs, Text, useDisclosure } from "@chakra-ui/react";
+import { Avatar, Box, Button, Checkbox, effect, Flex, FormControl, FormLabel, GridItem, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Tab, TabList, TabPanel, TabPanels, Tabs, Text, useDisclosure } from "@chakra-ui/react";
 import Header from "../../component/header";
 import { SearchIcon, AddIcon } from "@chakra-ui/icons";
 import { useGroupInfo } from "./services/mutations";
@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Outlet, useParams } from "react-router";
 import Account from "../account";
 import { useAddAccount } from "../account/services/mutations";
+import { useAccountList } from "../account/services/queries";
 
 
 interface AddExpenseModalProps {
@@ -28,6 +29,7 @@ const AddExpenseModal = ({ isOpen, onClose, users, groupId }: AddExpenseModalPro
     const [createBy, setCreateBy] = useState<number | null>(null);
     const [joinUser, setJoinUser] = useState<number[]>([]);
     const { mutateAsync: addAccount } = useAddAccount();
+    
 
     const handleSave = async () => {
         const expenseData = {
@@ -108,9 +110,12 @@ const AddExpenseModal = ({ isOpen, onClose, users, groupId }: AddExpenseModalPro
 const GroupInfo = () => {
     const { mutateAsync: getGroupInfo } = useGroupInfo();
     const [groupInfo, setGroupInfo] = useState<GroupInfo | null>(null)
+    const [totalAccount, setTotalAccount] = useState(0);
     const { groupId } = useParams()
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const { data, error, isLoading } = useAccountList(groupId || '');
 
+    // fetch group data
     useEffect(() => {
         const groupInfo = async () => {
             const data = await getGroupInfo(Number(groupId))
@@ -121,11 +126,26 @@ const GroupInfo = () => {
             groupInfo();
         }
     },[groupId, getGroupInfo])
+        
+    const accountData = data.map((item: any) => ({
+        ...item,
+        accountData: item
+    }))
 
-    if (!groupInfo) {
+    // update total account
+    useEffect(() => {
+        const total = accountData.reduce((total: any, item: any) => total + item.accountData.price, 0);
+        setTotalAccount(total);
+    },[data])
+
+    if (!groupInfo || !data) {
         return <div>Loading...</div>; // 添加加载状态
     }
+    
 
+
+    
+    
     return (
         <Box>
             <Header/>
@@ -134,9 +154,9 @@ const GroupInfo = () => {
                     <Box mr={5}>圖表</Box>
                     <Box ml={5} textAlign="left">
                         <Text fontSize="3xl" p={5} as='b'>{groupInfo.groupName}</Text>
-                        <Text>交易</Text>
+                        <Text pt={5}>交易: {accountData.length}</Text>
                         <Text py={3}>成員: {groupInfo.groupSize}</Text>
-                        <Text>總支出: $100</Text>
+                        <Text>總支出: {totalAccount}</Text>
                     </Box>
                 </Flex>
             </Box>
@@ -169,7 +189,7 @@ const GroupInfo = () => {
                                  </Box>
                             </TabPanel>
                             <TabPanel>
-                                <Account/>
+                                <Account data={data || []}/>
                             </TabPanel>
                         </TabPanels>
                     </Tabs>
